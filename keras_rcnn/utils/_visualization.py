@@ -38,3 +38,4 @@ def show_bounding_boxes(image, bounding_boxes, categories=None):
         )
 
         axis.add_patch(rectangle)
+    matplotlib.pyplot.show()
