@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import keras
-import keras_resnet.models
-
 
 def ResNet50():
     def f(x):
-        y = keras_resnet.models.ResNet50(
+        y = keras.applications.resnet50.ResNet50(
             include_top=False,
             inputs=x
         )

@@ -14,9 +14,28 @@ import keras
 import keras_rcnn.datasets.shape
 import keras_rcnn.models
 import keras_rcnn.preprocessing
+import keras_rcnn.utils
+import matplotlib.pyplot as plt
 
 
 def main():
+    def draw_result():
+        acc = history.history['acc']
+        val_acc = history.history['val_acc']
+        loss = history.history['loss']
+        val_loss = history.history['val_loss']
+        epochs = range(1, len(acc) + 1)
+        plt.plot(epochs, acc, 'b', label='Training acc')
+        plt.plot(epochs, val_acc, 'r', label='Validation acc')
+        plt.title('accuracy')
+        plt.legend()
+        plt.figure()
+        plt.plot(epochs, loss, 'y', label='Training loss')
+        plt.plot(epochs, val_loss, 'b', label='Validation loss')
+        plt.title('Loss')
+        plt.legend()
+        plt.show()
+
     training_dictionary, test_dictionary = keras_rcnn.datasets.shape.load_data()
 
     categories = {"circle": 1, "rectangle": 2, "triangle": 3}
@@ -45,15 +64,16 @@ def main():
         input_shape=(224, 224, 3)
     )
 
-    optimizer = keras.optimizers.Adam()
+    # optimizer = keras.optimizers.Adam()
 
-    model.compile(optimizer)
+    model.compile(loss='softmax', optimizer=keras.optimizers.RMSprop(lr=1e-4), metrics=['acc'])
 
-    model.fit_generator(
-        epochs=1,
-        generator=generator,
-        validation_data=validation_data
-    )
+    history = model.fit_generator(epochs=1, generator=generator, validation_data=validation_data, steps_per_epoch=100)
+    target = validation_data.next()[0][2]
+    x, y = model.predict(target)
+    # model.save('rcnn.h5', overwrite=True)
+    keras_rcnn.utils.show_bounding_boxes(target[0], x[0], y[0])
+    draw_result()
 
 
 if __name__ == '__main__':
