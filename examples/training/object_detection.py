@@ -10,6 +10,7 @@ stacking multiple images.
 """
 
 import keras
+import numpy
 
 import keras_rcnn.datasets.shape
 import keras_rcnn.models
@@ -65,15 +66,23 @@ def main():
     )
 
     # optimizer = keras.optimizers.Adam()
+    target = validation_data.next()[0][2]
 
     model.compile(loss='softmax', optimizer=keras.optimizers.RMSprop(lr=1e-4), metrics=['acc'])
 
     history = model.fit_generator(epochs=1, generator=generator, validation_data=validation_data, steps_per_epoch=100)
-    target = validation_data.next()[0][2]
     x, y = model.predict(target)
     # model.save('rcnn.h5', overwrite=True)
-    keras_rcnn.utils.show_bounding_boxes(target[0], x[0], y[0])
-    draw_result()
+
+    x = x[0]
+    y = y[0]
+    target = target[0]
+
+    x = numpy.squeeze(x)
+    y = numpy.squeeze(y)
+    target = numpy.squeeze(target)
+    numpy.amax(y, -1)
+    keras_rcnn.utils.show_bounding_boxes(target, x, y)
 
 
 if __name__ == '__main__':
